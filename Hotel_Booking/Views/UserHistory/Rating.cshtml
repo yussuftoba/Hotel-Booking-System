@@ -1,0 +1,101 @@
+﻿@model ReviewDto
+
+@{
+    ViewData["Title"] = "Rating";
+}
+
+<h1>Rating</h1>
+
+<h4>Review</h4>
+<hr />
+<div class="row">
+    <div class="col-lg-9 m-auto">
+        <div class="card shadow-sm border-0 rounded mb-4">
+
+            <div class="card-header bg-primary text-white py-3">
+
+                <h4 class="mb-0">Rate Your Experience</h4>
+
+            </div>
+
+            <div class="card-body p-4">
+
+                <form asp-action="Rating">
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+
+
+                    <div class="mb-3">
+
+                        <label asp-for="Rating" class="form-label fw-bold">Rating (1-5 stars)</label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text bg-primary text-white">
+
+                                <i class="bi bi-star-fill"></i>
+
+                            </span>
+
+                            <input asp-for="Rating" min="1" max="5" type="number" class="form-control" placeholder="Enter a rating from 1 to 5" />
+
+                        </div>
+
+                        <div class="form-text text-muted">
+
+                            1 = Poor, 5 = Excellent
+
+                        </div>
+
+                        <span asp-validation-for="Rating" class="text-danger"></span>
+
+                    </div>
+
+
+
+                    <div class="mb-4">
+
+                        <label asp-for="Comment" class="form-label fw-bold">Your Review</label>
+
+                        <textarea asp-for="Comment" class="form-control" rows="4" placeholder="Tell us about your experience..."></textarea>
+
+                        <span asp-validation-for="Comment" class="text-danger"></span>
+
+                    </div>
+
+
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+
+                        <a href="javascript:history.back()" class="btn btn-outline-secondary me-md-2">
+
+                            <i class="bi bi-arrow-left me-1"></i> Back
+
+                        </a>
+
+                        <button type="submit" class="btn btn-primary text-white">
+
+                            <i class="bi bi-star me-1"></i> Submit Review
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div>
+    <a class="btn btn-primary" asp-action="GetProfileHistory">Back to Booking History</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+

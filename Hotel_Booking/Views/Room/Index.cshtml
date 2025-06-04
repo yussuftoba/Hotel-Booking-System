@@ -1,0 +1,215 @@
+﻿@model IEnumerable<Room>
+@{
+    ViewData["Title"] = "Rooms";
+    var hotel = Model.FirstOrDefault()?.Hotel;
+}
+
+<style>
+    /* Room card styling and hover effects */
+    .room-card {
+        transition: all 0.3s ease;
+        border: none;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+        }
+
+    .room-img-container {
+        overflow: hidden;
+        height: 250px;
+    }
+
+    .room-img {
+        transition: transform 0.5s ease;
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .room-card:hover .room-img {
+        transform: scale(1.05);
+    }
+
+    .status-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 1;
+    }
+
+    .book-now-btn {
+        transition: all 0.3s ease;
+    }
+
+        .book-now-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+        }
+
+    .room-amenity {
+        display: inline-block;
+        margin-right: 15px;
+        margin-bottom: 10px;
+        color: #6c757d;
+    }
+
+    .room-price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #0d6efd;
+    }
+
+    .hotel-banner {
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1618773928121-c32242e63f39?ixlib=rb-4.0.3');
+        background-size: cover;
+        background-position: center;
+        padding: 60px 0;
+        margin-bottom: 40px;
+        color: white;
+    }
+</style>
+
+<!-- Hotel Banner -->
+@if (hotel != null)
+{
+    <div class="hotel-banner text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold">@hotel.Name</h1>
+            <p class="lead mb-0">@hotel.Address</p>
+            <div class="mt-2">
+                @{
+                    int fullStars = (int)Math.Floor(hotel.StarRating);
+                    bool hasHalfStar = (hotel.StarRating - fullStars) >= 0.5;
+                    int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                }
+
+                @for (int i = 0; i < fullStars; i++)
+                {
+                    <i class="bi bi-star-fill text-warning"></i>
+                }
+
+                @if (hasHalfStar)
+                {
+                    <i class="bi bi-star-half text-warning"></i>
+                }
+
+                @for (int i = 0; i < emptyStars; i++)
+                {
+                    <i class="bi bi-star text-warning"></i>
+                }
+            </div>
+        </div>
+    </div>
+
+}
+
+<div class="container pb-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Hotel" asp-action="Index">Hotels</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Rooms</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Hotel Description -->
+    @if (hotel != null)
+    {
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h4 class="card-title border-bottom pb-3 mb-3">About this Hotel</h4>
+                        <p class="card-text">@hotel.Description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <h2 class="mb-4">Available Rooms</h2>
+
+    @foreach (var room in Model)
+    {
+        <div class="card room-card shadow">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <div class="room-img-container h-100">
+                        <img src="@(string.IsNullOrEmpty(room.ImageUrl) ? "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3" : room.ImageUrl)"
+                             class="room-img" alt="@room.Type">
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body p-4">
+                        <div class="status-badge">
+                            @if (room.AvailabilityStatus == "Available")
+                            {
+                                <span class="badge bg-success px-3 py-2">Available</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger px-3 py-2">Occupied</span>
+                            }
+                        </div>
+
+                        <h3 class="card-title fw-bold mb-2">@room.Type - Room @room.RoomNumber</h3>
+                        <p class="card-text mb-3">@room.SpecialFeatures</p>
+
+                        <div class="mb-3">
+                            <div class="room-amenity"><i class="bi bi-rulers me-2"></i> @room.Floor Floor</div>
+                            <div class="room-amenity"><i class="bi bi-tv me-2"></i> Cable TV</div>
+                            <div class="room-amenity"><i class="bi bi-wifi me-2"></i> Free WiFi</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <div>
+                                <span class="room-price">$@room.BasePrice</span>
+                                <span class="text-muted"> / night</span>
+                            </div>
+
+                            @if (ViewBag.UserId != 0 && room.AvailabilityStatus == "Available")
+                            {
+                                <a asp-controller="Booking" asp-action="BookingProcess" asp-route-id="@room.Id" class="btn btn-primary book-now-btn px-4 py-2">
+                                    <i class="bi bi-calendar-check me-2"></i> Book Now
+                                </a>
+                            }
+                            else if (ViewBag.UserId == 0)
+                            {
+                                <a asp-controller="Account" asp-action="SignIn" class="btn btn-outline-primary book-now-btn px-4 py-2">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i> Sign In to Book
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary px-4 py-2" disabled>
+                                    <i class="bi bi-x-circle me-2"></i> Unavailable
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Empty state handling -->
+    @if (!Model.Any())
+    {
+        <div class="text-center my-5 py-5">
+            <i class="bi bi-door-closed display-1 text-muted"></i>
+            <h3 class="mt-4">No Rooms Available</h3>
+            <p class="text-muted">There are currently no rooms available for this hotel.</p>
+            <a asp-controller="Hotel" asp-action="Index" class="btn btn-outline-primary mt-3">
+                <i class="bi bi-arrow-left me-2"></i> Back to Hotels
+            </a>
+        </div>
+    }
+</div>

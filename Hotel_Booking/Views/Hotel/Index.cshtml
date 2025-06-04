@@ -1,0 +1,187 @@
+﻿@model IEnumerable<Hotel>
+@{
+    ViewData["Title"] = "Hotels";
+}
+
+<style>
+    /* Hotel card styling and hover effects */
+    .hotel-card {
+        transition: all 0.3s ease;
+        border: none;
+        height: 100%;
+    }
+
+        .hotel-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+        }
+
+    .hotel-img-container {
+        overflow: hidden;
+        height: 200px;
+    }
+
+    .hotel-img {
+        transition: transform 0.5s ease;
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .hotel-card:hover .hotel-img {
+        transform: scale(1.1);
+    }
+
+    .hotel-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+    }
+
+    .view-rooms-btn {
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+        .view-rooms-btn:hover {
+            transform: translateX(5px);
+        }
+
+    .star-rating {
+        color: #ffc107;
+    }
+
+    .page-banner {
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3');
+        background-size: cover;
+        background-position: center;
+        padding: 80px 0;
+        margin-bottom: 40px;
+        color: white;
+    }
+
+    .contact-info {
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .contact-icon {
+        width: 20px;
+        display: inline-block;
+        text-align: center;
+        margin-right: 5px;
+    }
+</style>
+
+<!-- Page Banner -->
+<div class="page-banner text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Find Your Perfect Stay</h1>
+        <p class="lead">Discover our selection of premium hotels for your next adventure</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Hotels</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var hotel in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow hotel-card h-100">
+                    <div class="hotel-badge">
+                        <span class="badge bg-primary rounded-pill px-3 py-2">@hotel.Name</span>
+                    </div>
+                    <div class="hotel-img-container">
+                        <img src="~/Images/@hotel.ImageUrl"
+                             class="card-img-top hotel-img" alt="@hotel.Name">
+                    </div>
+                    <div class="card-body d-flex flex-column">
+
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="star-rating">
+                                @{
+                                    int fullStars = (int)Math.Floor(hotel.StarRating);
+                                    bool hasHalfStar = hotel.StarRating - fullStars >= 0.5;
+                                    int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                                }
+
+                                @for (int i = 0; i < fullStars; i++)
+                                {
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                }
+
+                                @if (hasHalfStar)
+                                {
+                                    <i class="bi bi-star-half text-warning"></i>
+                                }
+
+                                @for (int i = 0; i < emptyStars; i++)
+                                {
+                                    <i class="bi bi-star text-warning"></i>
+                                }
+
+                                <span class="ms-1 small">(@hotel.StarRating.ToString("0.0"))</span>
+                            </div>
+                        </div>
+
+                        <div class="contact-info">
+                            <p class="mb-1">
+                                <span class="contact-icon"><i class="bi bi-geo-alt-fill text-danger"></i></span>
+                                @hotel.City, @hotel.Address
+                            </p>
+                            <p class="mb-1">
+                                <span class="contact-icon"><i class="bi bi-telephone-fill text-success"></i></span>
+                                @(string.IsNullOrEmpty(hotel.PhoneNumber) ? "N/A" : hotel.PhoneNumber)
+                            </p>
+                            <p class="mb-2">
+                                <span class="contact-icon"><i class="bi bi-envelope-fill text-primary"></i></span>
+                                @(string.IsNullOrEmpty(hotel.Email) ? "N/A" : hotel.Email)
+                            </p>
+                        </div>
+
+                        <p class="card-text mb-3">@(hotel.Description?.Length > 100 ? hotel.Description.Substring(0, 100) + "..." : hotel.Description)</p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a asp-controller="Room" asp-action="Index" asp-route-id="@hotel.Id" class="btn btn-outline-primary view-rooms-btn">
+                                    View Rooms <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                        <small class="text-muted">
+                            <i class="bi bi-wifi me-1"></i> Free WiFi
+                        </small>
+                        <small class="text-muted">
+                            <i class="bi bi-p-circle-fill me-1"></i> Free Parking
+                        </small>
+                        <small class="text-muted">
+                            <i class="bi bi-cup-hot me-1"></i> Breakfast
+                        </small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Empty state handling -->
+    @if (!Model.Any())
+    {
+        <div class="text-center my-5 py-5">
+            <i class="bi bi-hotel display-1 text-muted"></i>
+            <h3 class="mt-4">No Hotels Available</h3>
+            <p class="text-muted">We're adding new properties soon. Please check back later.</p>
+        </div>
+    }
+</div>

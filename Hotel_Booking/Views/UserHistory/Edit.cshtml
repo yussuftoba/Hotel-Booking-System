@@ -1,0 +1,77 @@
+﻿@model BookingDto
+
+@{
+    ViewData["Title"] = "Edit Booking";
+}
+
+<div class="bg-primary text-white py-5 mb-4">
+    <div class="container">
+        <h1 class="display-5">Edit Booking</h1>
+        <p class="lead">Update your reservation details</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0 rounded">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0">Update Booking Details</h4>
+                </div>
+                <div class="card-body p-4">
+                    @if (ViewBag.RoomNumber != null)
+                    {
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <strong>Room Number:</strong> @ViewBag.RoomNumber
+                        </div>
+                    }
+
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="CheckInDate" class="form-label">Check-in Date</label>
+                                    <input asp-for="CheckInDate" class="form-control" type="date" />
+                                    <span asp-validation-for="CheckInDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="CheckOutDate" class="form-label">Check-out Date</label>
+                                    <input asp-for="CheckOutDate" class="form-control" type="date" />
+                                    <span asp-validation-for="CheckOutDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="PaymentMethod" class="form-label">Payment Method</label>
+                            <select asp-for="PaymentMethod" asp-items="@ViewBag.PaymentMethods" class="form-select">
+                                <option value="0">--Select Payment Method--</option>
+                            </select>
+                            <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="GetProfileHistory" class="btn btn-outline-secondary me-md-2">
+                                <i class="bi bi-arrow-left me-1"></i> Back to History
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
