@@ -3,6 +3,7 @@ using Context;
 using Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Repo;
 using Stripe.Terminal;
@@ -38,6 +39,20 @@ namespace Hotel_Booking
             {
                 options.SaveToken = true;
                 options.RequireHttpsMetadata = false;
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        // Read token from cookie if available
+                        var accessToken = context.HttpContext.Request.Cookies["jwt"];
+                        if (!string.IsNullOrEmpty(accessToken))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuer = true,
@@ -48,12 +63,13 @@ namespace Hotel_Booking
                     ValidAudience = builder.Configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecritKey"]!))
                 };
-            }
+                }
             );
 
             //Stripe Configuration
             Stripe.StripeConfiguration.ApiKey = builder.Configuration["Secretkey"];
 
+            builder.Configuration.AddUserSecrets<Program>();
 
             var app = builder.Build();
 
@@ -70,11 +86,12 @@ namespace Hotel_Booking
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Hotel}/{action=Index}/{id?}");
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
         }

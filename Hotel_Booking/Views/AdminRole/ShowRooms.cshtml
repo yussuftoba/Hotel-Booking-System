@@ -72,7 +72,11 @@
         color: white;
     }
 </style>
+<div class="row">
+	<!-- Sidebar -->
+	<partial name="_SidebarPartialView"></partial>
 
+    <div class="col-md-10 p-4">
 <!-- Hotel Banner -->
 @if (hotel != null)
 {
@@ -104,22 +108,9 @@
             </div>
         </div>
     </div>
-
 }
 
 <div class="container pb-5">
-    <div class="row mb-4">
-        <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Home</a></li>
-                    <li class="breadcrumb-item"><a asp-controller="Hotel" asp-action="Index">Hotels</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Rooms</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
-
     <!-- Hotel Description -->
     @if (hotel != null)
     {
@@ -136,6 +127,13 @@
     }
 
     <h2 class="mb-4">Available Rooms</h2>
+
+    <!-- Add Room Button -->
+    <div class="mb-4 text-end">
+        <a asp-controller="AdminRole" asp-action="AddRoom" class="btn btn-success px-4 py-2">
+            <i class="bi bi-plus-circle me-2"></i> Add Room
+        </a>
+    </div>
 
     @foreach (var room in Model)
     {
@@ -175,16 +173,10 @@
                                 <span class="text-muted"> / night</span>
                             </div>
 
-                            @if (ViewBag.UserId != 0 && room.AvailabilityStatus == "Available")
+                            @if (room.AvailabilityStatus == "Available")
                             {
-                                <a asp-controller="Booking" asp-action="BookingProcess" asp-route-id="@room.Id" class="btn btn-primary book-now-btn px-4 py-2">
-                                    <i class="bi bi-calendar-check me-2"></i> Book Now
-                                </a>
-                            }
-                            else if (ViewBag.UserId == 0)
-                            {
-                                <a asp-controller="Account" asp-action="SignIn" class="btn btn-outline-primary book-now-btn px-4 py-2">
-                                    <i class="bi bi-box-arrow-in-right me-2"></i> Sign In to Book
+                                <a asp-controller="AdminRole" asp-action="EditRoom" asp-route-id="@room.Id" class="btn btn-primary book-now-btn px-4 py-2">
+                                    <i class="bi bi-calendar-check me-2"></i> Edit Room
                                 </a>
                             }
                             else
@@ -199,6 +191,7 @@
             </div>
         </div>
     }
+    </div>
 
     <!-- Empty state handling -->
     @if (!Model.Any())
@@ -207,9 +200,11 @@
             <i class="bi bi-door-closed display-1 text-muted"></i>
             <h3 class="mt-4">No Rooms Available</h3>
             <p class="text-muted">There are currently no rooms available for this hotel.</p>
-            <a asp-controller="Hotel" asp-action="Index" class="btn btn-outline-primary mt-3">
+            <a asp-controller="AdminRole" asp-action="ShowHotels" class="btn btn-outline-primary mt-3">
                 <i class="bi bi-arrow-left me-2"></i> Back to Hotels
             </a>
         </div>
     }
 </div>
+</div>
+

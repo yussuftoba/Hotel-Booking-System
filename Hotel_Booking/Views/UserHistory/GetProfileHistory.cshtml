@@ -163,7 +163,7 @@
                         <div class="card booking-card shadow-sm">
                             <div class="row g-0">
                                 <div class="col-md-3">
-                                    <img src="~/Images/@booking.Room?.Hotel?.ImageUrl"
+                                    <img src="~/Images/Hotels/@booking.Room?.Hotel?.ImageUrl"
                                          class="img-fluid hotel-img h-100" alt="@booking.Room?.Hotel?.Name">
                                 </div>
                                 <div class="col-md-9">
@@ -211,19 +211,20 @@
                                             <h5 class="fw-bold text-primary mb-0">$@booking.TotalPrice.ToString("0.00")</h5>
 
                                             <div class="d-flex gap-2">
-                                                @if (booking.CheckInDate >= DateTime.Now)
+                                               
+                                                @if (booking.BookingStatus == "Completed")
+                                                {
+                                                    <a asp-action="Rating" asp-route-id="@booking.Id" class="btn btn-outline-warning action-btn">
+                                                        <i class="bi bi-star me-1"></i> Rate
+                                                    </a>
+                                                }
+                                                else
                                                 {
                                                     <a asp-action="Edit" asp-route-id="@booking.Id" class="btn btn-outline-primary action-btn">
                                                         <i class="bi bi-pencil me-1"></i> Edit
                                                     </a>
                                                     <a asp-action="Delete" asp-route-id="@booking.Id" class="btn btn-outline-danger action-btn">
                                                         <i class="bi bi-trash me-1"></i> Cancel
-                                                    </a>
-                                                }
-                                                @if (booking.CheckOutDate <= DateTime.Now)
-                                                {
-                                                    <a asp-action="Rating" asp-route-id="@booking.Id" class="btn btn-outline-warning action-btn">
-                                                        <i class="bi bi-star me-1"></i> Rate
                                                     </a>
                                                 }
                                             </div>
@@ -248,7 +249,7 @@
                             <div class="card booking-card shadow-sm">
                                 <div class="row g-0">
                                     <div class="col-md-3">
-                                        <img src="~/Images/@booking.Room?.Hotel?.ImageUrl"
+                                        <img src="~/Images/Hotels/@booking.Room?.Hotel?.ImageUrl"
                                              class="img-fluid hotel-img h-100" alt="@booking.Room?.Hotel?.Name">
                                     </div>
                                     <div class="col-md-9">
@@ -325,7 +326,7 @@
                             <div class="card booking-card shadow-sm">
                                 <div class="row g-0">
                                     <div class="col-md-3">
-                                        <img src="~/Images/@booking.Room?.Hotel?.ImageUrl"
+                                        <img src="~/Images/Hotels/@booking.Room?.Hotel?.ImageUrl"
                                              class="img-fluid hotel-img h-100" alt="@booking.Room?.Hotel?.Name">
                                     </div>
                                     <div class="col-md-9">

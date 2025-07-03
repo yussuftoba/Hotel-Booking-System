@@ -1,0 +1,122 @@
+﻿@model IEnumerable<Booking>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <partial name="_SidebarPartialView"></partial>
+
+        <div class="col-10">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">All Bookings</h4>
+                </div>
+
+                <div class="card-body">
+                    @if (Model != null)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Guest</th>
+                                        <th>Hotel</th>
+                                        <th>Room</th>
+                                        <th>Check-in</th>
+                                        <th>Check-out</th>
+                                        <th>Price</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in Model)
+                                    {
+                                        <tr>
+                                            <td>#@booking.Id</td>
+                                            <td>@(booking.User?.FirstName ?? "N/A") @(booking.User?.LastName ?? "")</td>
+                                            <td>@(booking.Room?.Hotel?.Name ?? "Unknown")</td>
+                                            <td>@(booking.Room?.RoomNumber )</td>
+                                            <td>@booking.CheckInDate.ToShortDateString()</td>
+                                            <td>@booking.CheckOutDate.ToShortDateString()</td>
+                                            <td>$@booking.TotalPrice.ToString("N2")</td>
+                                            <td>
+                                                <span class="badge @(GetStatusClass(booking.PaymentStatus))">
+                                                    @(booking.PaymentStatus ?? "Unknown")
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a asp-action="DeleteBooking" asp-route-id="@booking.Id" class="btn btn-outline-danger action-btn">
+                                                    <i class="bi bi-trash me-1"></i> Delete
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <h5 class="text-muted">No Bookings Found</h5>
+                            <p class="text-muted">
+                                @if (Model == null)
+                                {
+                                    <span>Unable to load booking data.</span>
+                                }
+                                else
+                                {
+                                    <span>There are no bookings to display.</span>
+                                }
+                            </p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@functions {
+    string GetStatusClass(string status)
+    {
+        return status?.ToLower() switch
+        {
+            "paid" or "confirmed" => "bg-success",
+            "pending" => "bg-warning",
+            "cancelled" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+
+<style>
+    .card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+    .badge {
+        font-size: 0.75rem;
+    }
+
+    .modal-content {
+        border-radius: 0.375rem;
+    }
+</style>

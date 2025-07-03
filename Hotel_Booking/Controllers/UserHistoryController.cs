@@ -9,6 +9,7 @@ using Models;
 
 namespace Hotel_Booking.Controllers
 {
+    [Authorize]
     public class UserHistoryController : MVCControlBase
     {
         public UserHistoryController(IUnitOfWork unitOfWork) : base(unitOfWork)

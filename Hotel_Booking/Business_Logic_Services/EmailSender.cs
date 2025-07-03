@@ -3,6 +3,7 @@ using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,23 +12,25 @@ namespace Business_Logic_Services;
 
 public class EmailSender
 {
-    private string apiKey;
+    private string hostEmail;
     private string fromEmail;
-    private string senderName;
+    private string password;
+    private int port;
     public EmailSender(IConfiguration configuration)
     {
-        apiKey = configuration["EmailSender:ApiKey"]!;
         fromEmail = configuration["EmailSender:FromEmail"]!;
-        senderName = configuration["EmailSender:SenderName"]!;
+        hostEmail = configuration["EmailSender:HostEmail"]!;
+        port = int.Parse(configuration["EmailSender:Port"]!);
+        password =configuration["EmailSender:Password"]!;
+        
     }
-    public async Task SendEmail(string subject, string toEmail, string userName, string message)
+    public void SendEmail(string subject, string toEmail, string message)
     {
-        var client = new SendGridClient(apiKey);
-        var from = new EmailAddress(fromEmail, senderName);
-        var to = new EmailAddress(toEmail, userName);
-        var plainTextContent = message;
-        var htmlContent = "";
-        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-        var response = await client.SendEmailAsync(msg);
+        var client = new SmtpClient(hostEmail, port);
+        client.EnableSsl = true;
+
+        client.Credentials = new NetworkCredential(fromEmail, password);
+
+        client.Send(fromEmail, toEmail,subject, message);
     }
 }

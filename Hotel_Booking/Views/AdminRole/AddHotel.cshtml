@@ -1,0 +1,252 @@
+﻿@model HotelDto
+
+@{
+	ViewData["Title"] = "Add Hotel Details";
+}
+
+<style>
+	.booking-card {
+		transition: all 0.3s ease;
+		border-radius: 10px;
+		overflow: hidden;
+		border: none;
+	}
+
+		.booking-card:hover {
+			box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+		}
+
+	.card-header {
+		background: linear-gradient(to right, #0d6efd, #198754);
+		color: white;
+		font-weight: bold;
+	}
+
+	.form-control, .form-select {
+		transition: all 0.2s ease;
+		border-radius: 5px;
+	}
+
+		.form-control:focus, .form-select:focus {
+			border-color: #0d6efd;
+			box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+		}
+
+	.btn {
+		transition: all 0.3s ease;
+		border-radius: 5px;
+	}
+
+	.btn-primary:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+	}
+
+	.btn-primary:active {
+		transform: translateY(1px);
+	}
+
+	.booking-header {
+		background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3');
+		background-position: center;
+		background-size: cover;
+		color: white;
+		padding: 60px 0;
+		margin-bottom: 30px;
+	}
+
+	.back-link {
+		transition: all 0.3s ease;
+		text-decoration: none;
+	}
+
+		.back-link:hover {
+			color: #0a58ca;
+			transform: translateX(-3px);
+		}
+
+		.back-link i {
+			transition: all 0.3s ease;
+		}
+
+		.back-link:hover i {
+			transform: translateX(-3px);
+		}
+
+	.section-divider {
+		border-top: 2px solid #e9ecef;
+		margin: 30px 0 20px 0;
+		position: relative;
+	}
+
+	.section-title {
+		background: white;
+		padding: 0 15px;
+		color: #6c757d;
+		font-weight: 600;
+		position: absolute;
+		top: -12px;
+		left: 20px;
+	}
+
+	.image-preview {
+		max-width: 200px;
+		max-height: 150px;
+		border-radius: 5px;
+		border: 2px dashed #dee2e6;
+		padding: 10px;
+		margin-top: 10px;
+	}
+
+		.image-preview img {
+			width: 100%;
+			height: auto;
+			border-radius: 3px;
+		}
+</style>
+
+<div class="row">
+	<!-- Sidebar -->
+	<partial name="_SidebarPartialView"></partial>
+
+	<div class="col-md-10 p-4">
+		<div class="booking-header text-center">
+			<div class="container">
+				<h1 class="display-4">Add Hotel Details</h1>
+				<p class="lead">Complete your hotel information</p>
+			</div>
+		</div>
+
+		<div class="container mb-5">
+			<div class="row justify-content-center">
+				<div class="col-md-10">
+					<div class="card shadow booking-card">
+						<div class="card-header py-3">
+							<h4 class="mb-0">Hotel Information</h4>
+						</div>
+						<div class="card-body p-4">
+							<form asp-action="AddHotel" method="post" enctype="multipart/form-data" id="hotel-form">
+								<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+								<!-- Hotel Details Section -->
+								<h5 class="text-primary mb-3">
+									<i class="bi bi-building me-2"></i>Hotel Details
+								</h5>
+
+								<div class="row mb-3">
+									<div class="col-md-6">
+										<label asp-for="Name" class="form-label">Hotel Name</label>
+										<input asp-for="Name" class="form-control" type="text" placeholder="Enter hotel name" />
+										<span asp-validation-for="Name" class="text-danger"></span>
+									</div>
+									<div class="col-md-6">
+										<label asp-for="City" class="form-label">City</label>
+										<input asp-for="City" class="form-control" type="text" placeholder="Enter city" />
+										<span asp-validation-for="City" class="text-danger"></span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-md-8">
+										<label asp-for="Address" class="form-label">Address</label>
+										<input asp-for="Address" class="form-control" type="text" placeholder="Enter full address" />
+										<span asp-validation-for="Address" class="text-danger"></span>
+									</div>
+									<div class="col-md-4">
+										<label asp-for="Country" class="form-label">Country</label>
+										<input asp-for="Country" class="form-control" type="text" placeholder="Enter country" />
+										<span asp-validation-for="Country" class="text-danger"></span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-md-6">
+										<label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+										<input asp-for="PhoneNumber" class="form-control" type="tel" placeholder="Enter phone number" />
+										<span asp-validation-for="PhoneNumber" class="text-danger"></span>
+									</div>
+									<div class="col-md-6">
+										<label asp-for="Email" class="form-label">Email Address</label>
+										<input asp-for="Email" class="form-control" type="email" placeholder="Enter email address" />
+										<span asp-validation-for="Email" class="text-danger"></span>
+									</div>
+								</div>
+
+								<div class="mb-3">
+									<label asp-for="Description" class="form-label">Hotel Description</label>
+									<textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe the hotel facilities, amenities, and features..."></textarea>
+									<span asp-validation-for="Description" class="text-danger"></span>
+								</div>
+
+								<div class="row mb-4">
+									<div class="col-md-6">
+										<label asp-for="ImageFile" class="form-label">Hotel Image</label>
+										<input asp-for="ImageFile" class="form-control" type="file" accept="image/*" id="imageUpload" />
+									</div>
+
+								</div>
+
+								<div class="d-grid gap-2">
+									<button type="submit" class="btn btn-primary btn-lg" id="submit-button">
+										<i class="bi bi-check-circle me-2"></i>Save Hotel Details
+									</button>
+								</div>
+							</form>
+
+						</div>
+						<div class="card-footer bg-light p-3">
+							<a asp-action="ShowHotels" asp-controller="AdminRole" class="back-link d-inline-flex align-items-center">
+								<i class="bi bi-arrow-left me-2"></i> Back to Hotels List
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+
+	<script src="https://js.stripe.com/v3/"></script>
+
+	<script>
+		// Image preview functionality
+		document.getElementById('imageUpload').addEventListener('change', function (e) {
+			const file = e.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					document.getElementById('previewImg').src = e.target.result;
+					document.getElementById('imagePreview').style.display = 'block';
+					document.getElementById('imageUrl').value = ''; // Clear URL input
+				};
+				reader.readAsDataURL(file);
+			} else {
+				document.getElementById('imagePreview').style.display = 'none';
+			}
+		});
+
+		document.getElementById('imageUrl').addEventListener('input', function (e) {
+			const url = e.target.value;
+			if (url) {
+				document.getElementById('previewImg').src = url;
+				document.getElementById('imagePreview').style.display = 'block';
+				document.getElementById('imageUpload').value = ''; // Clear file input
+			} else {
+				document.getElementById('imagePreview').style.display = 'none';
+			}
+		});
+
+		// Form submission
+		var form = document.getElementById('hotel-form');
+		form.addEventListener('submit', function (event) {
+			document.getElementById("submit-button").disabled = true;
+			document.getElementById("submit-button").innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Saving...';
+		});
+	</script>
+}

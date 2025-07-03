@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>8d8e382f-4633-4b73-a602-c33201d38062</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,11 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.4" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Images\Hotels\" />
+    <Folder Include="wwwroot\Images\Rooms\" />
   </ItemGroup>
 
 </Project>

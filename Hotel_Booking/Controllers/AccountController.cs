@@ -68,6 +68,7 @@ namespace Hotel_Booking.Controllers
             return View(signUpDto);
         }
 
+        [AllowAnonymous]
         public IActionResult SignIn()
         {
             return View();
@@ -91,7 +92,7 @@ namespace Hotel_Booking.Controllers
                             var claims = new List<Claim>();
                             claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
                             claims.Add(new Claim("id", "" + user.Id));
-                            claims.Add(new Claim("rold", user.Role));
+                            claims.Add(new Claim("role", user.Role));
                             claims.Add(new Claim("name", user.FirstName+" "+user.LastName));
 
                             var signKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:SecritKey"]!));
@@ -100,7 +101,7 @@ namespace Hotel_Booking.Controllers
                             var token = new JwtSecurityToken(
                                 issuer: _config["JWT:Issuer"],
                                 audience: _config["JWT:Audience"],
-                                expires: DateTime.Now.AddHours(1),
+                                expires: DateTime.Now.AddMinutes(30),
                                 claims: claims,
                                 signingCredentials: signingCredentials
                             );
@@ -111,9 +112,15 @@ namespace Hotel_Booking.Controllers
                             {
                                 HttpOnly = true,
                                 Secure = true,
-                                Expires = DateTime.Now.AddHours(1),
+                                Expires = DateTime.Now.AddMinutes(30),
                                 SameSite = SameSiteMode.Strict
                             });
+
+                            //Sign In for Admin
+                            if(user.Role == "Admin")
+                            {
+                                return RedirectToAction("Dashboard", "AdminRole");
+                            }
 
                             return RedirectToAction("Index", "Hotel");
                         }
@@ -145,6 +152,7 @@ namespace Hotel_Booking.Controllers
             return RedirectToAction("SignIn");
         }
 
+        [Authorize]
         public async Task<IActionResult> UpdateProfile(UserDto userDto)
         {
             if(ModelState.IsValid)
@@ -167,6 +175,7 @@ namespace Hotel_Booking.Controllers
             return RedirectToAction("GetUserProfile");
         }
 
+        [Authorize]
         public async Task<IActionResult> UpdatePassword(string oldPassword, string newPassword)
         {
             if(ModelState.IsValid)
@@ -224,16 +233,14 @@ namespace Hotel_Booking.Controllers
 
                 _unitOfWork.Save();
 
-                var userName = user.FirstName + " " + user.LastName;
-
                 string subject = "Password Reset";
-                string message = "Dear " + userName + "\n" +
+                string message = "Dear sir, " + "\n" +
                     "We received your password reset request.\n" +
                     "Please copy the following token and paste it in the Password Reset Form:\n" +
                 code + "\n\n" +
                 "Best Regards\n";
 
-                await _emailSender.SendEmail(subject, user.Email, userName, message);
+                _emailSender.SendEmail(subject, user.Email, message);
                 return RedirectToAction("ResetPassword");
             }
             return View(forgetPasswordDto);
@@ -267,6 +274,7 @@ namespace Hotel_Booking.Controllers
             return View(resetPasswordDto);
         }
 
+        [Authorize]
         public IActionResult LogOut()
         {
             Response.Cookies.Delete("jwt");
@@ -312,7 +320,12 @@ namespace Hotel_Booking.Controllers
         {
             return GetClaimFromJWT(httpContext, "name")!;
         }
-        #endregion
 
-    }
+		public static string GetUserRole(HttpContext httpContext)
+		{
+			return GetClaimFromJWT(httpContext, "role")!;
+		}
+		#endregion
+
+	}
 }

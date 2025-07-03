@@ -1,0 +1,377 @@
+﻿@model PaymentDto
+
+@{
+    ViewData["Title"] = "Payment Information";
+}
+
+<style>
+    .booking-card {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        overflow: hidden;
+        border: none;
+    }
+
+    .booking-card:hover {
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        background: linear-gradient(to right, #0d6efd, #198754);
+        color: white;
+        font-weight: bold;
+    }
+
+    .form-control, .form-select {
+        transition: all 0.2s ease;
+        border-radius: 5px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .btn {
+        transition: all 0.3s ease;
+        border-radius: 5px;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+    }
+
+    .btn-primary:active {
+        transform: translateY(1px);
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-outline-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .payment-status-animation {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    .processing-spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    .payment-header {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3');
+        background-position: center;
+        background-size: cover;
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 30px;
+    }
+
+    .back-link {
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .back-link:hover {
+        color: #0a58ca;
+        transform: translateX(-3px);
+    }
+
+    .back-link i {
+        transition: all 0.3s ease;
+    }
+
+    .back-link:hover i {
+        transform: translateX(-3px);
+    }
+
+    .total-price {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 1.25rem;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+
+    #card-element {
+        padding: 12px 16px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        background-color: white;
+        transition: all 0.2s ease;
+    }
+
+    #card-element:focus-within {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style>
+
+<div class="payment-header text-center">
+    <div class="container">
+        <h1 class="display-4">Payment Information</h1>
+        <p class="lead">Secure payment processing</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            
+            <div class="card shadow booking-card">
+                <div class="card-header py-3">
+                    <h4 class="mb-0"><i class="bi bi-credit-card me-2"></i>Payment Details</h4>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <!-- store bookingId in tempdata-->
+                    <input type="hidden" name="BookingId" value="@TempData["bookingId"]" />
+
+                    <!-- Total Price Display -->
+                    <div class="total-price">
+                        <i class="bi bi-currency-dollar me-2"></i>
+                        <span>Total Amount: $@Model.TotalPrice</span>
+                    </div>
+
+                    <form asp-action="PaymentProcess" method="post" id="payment-form">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Payment Method Display -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="bi bi-credit-card me-2"></i>Payment Method
+                            </label>
+                            <div class="form-control-plaintext bg-light border rounded p-3">
+                                <i class="bi bi-credit-card-fill me-2 text-primary"></i>
+                                <strong>@Model.PaymentMethod</strong>
+                                <input type="hidden" asp-for="PaymentMethod" value="@ViewBag.PaymentMethodId" />
+                            </div>
+                        </div>
+
+                        <!-- Stripe Card Element -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="bi bi-shield-lock me-2"></i>Credit Card Information
+                            </label>
+                            <div id="card-element" class="form-control p-2"></div>
+                            <div id="card-errors" class="text-danger mt-2"></div>
+                            <input type="hidden" name="StripeToken" id="StripeToken" />
+                            <small class="text-muted">
+                                <i class="bi bi-shield-check me-1"></i>
+                                Your payment information is secure and encrypted
+                            </small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submit-button">
+                                <i class="bi bi-lock-fill me-2"></i>Process Payment
+                            </button>
+                            
+                            <!-- Success Button (hidden by default) -->
+                            <button type="button" class="btn btn-success btn-lg d-none" id="success-button">
+                                <i class="bi bi-check-circle-fill me-2"></i>Payment Successful!
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="card-footer bg-light p-3">
+                    <a asp-action="GetProfileHistory" asp-controller="UserHistory" class="back-link d-inline-flex align-items-center">
+                        <i class="bi bi-arrow-left me-2"></i> Back to Booking History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <script>
+        // Check if payment was successful on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (ViewBag.PaymentSuccess == true)
+            {
+                <text>
+                // Hide the payment form if payment was successful
+                document.getElementById('payment-form').style.display = 'none';
+                
+                // Show success message with redirect option
+                setTimeout(function() {
+                    if (confirm('Payment successful! Would you like to view your booking confirmation?')) {
+                        window.location.href = '@Url.Action("GetProfileHistory", "UserHistory")';
+                    }
+                }, 2000);
+                </text>
+            }
+        });
+
+        var stripe = Stripe('@ViewBag.PublishableKey');
+        var elements = stripe.elements();
+
+        var style = {
+            base: {
+                color: '#212529',
+                fontFamily: '"Segoe UI", sans-serif',
+                fontSize: '16px',
+                '::placeholder': {
+                    color: '#6c757d'
+                }
+            },
+            invalid: {
+                color: '#dc3545',
+                iconColor: '#dc3545'
+            }
+        };
+
+        var card = elements.create('card', { style: style });
+        card.mount('#card-element');
+
+        card.on('change', function (event) {
+            var displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+
+        var form = document.getElementById('payment-form');
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            
+            // Show processing state
+            var submitButton = document.getElementById("submit-button");
+            var originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="bi bi-arrow-clockwise processing-spinner me-2"></i>Processing...';
+
+            const { token, error } = await stripe.createToken(card);
+
+            if (error) {
+                // Show error state
+                document.getElementById('card-errors').textContent = error.message;
+                showFailedState();
+                
+                // Reset submit button
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            } else {
+                document.getElementById('StripeToken').value = token.id;
+                
+                // Submit form to server for actual payment processing
+                form.submit();
+            }
+        });
+
+        // Cancel button functionality
+        document.getElementById('cancel-button').addEventListener('click', function() {
+            if (confirm('Are you sure you want to cancel the payment?')) {
+                showCancelledState();
+            }
+        });
+
+        function showSuccessState() {
+            document.getElementById('submit-button').classList.add('d-none');
+            document.getElementById('cancel-button').classList.add('d-none');
+            document.getElementById('failed-button').classList.add('d-none');
+            
+            var successButton = document.getElementById('success-button');
+            successButton.classList.remove('d-none');
+            successButton.classList.add('payment-status-animation');
+            
+            // Disable form inputs
+            document.getElementById('card-element').style.pointerEvents = 'none';
+            document.getElementById('card-element').style.opacity = '0.6';
+            
+            // Optional: Redirect after success
+            setTimeout(function() {
+                // window.location.href = '/Booking/Confirmation';
+            }, 2000);
+        }
+
+        function showFailedState() {
+            document.getElementById('submit-button').classList.add('d-none');
+            document.getElementById('cancel-button').classList.add('d-none');
+            document.getElementById('success-button').classList.add('d-none');
+            
+            var failedButton = document.getElementById('failed-button');
+            failedButton.classList.remove('d-none');
+            failedButton.classList.add('payment-status-animation');
+            
+            // Allow retry after 3 seconds
+            setTimeout(function() {
+                resetButtonStates();
+            }, 3000);
+        }
+
+        function showCancelledState() {
+            var failedButton = document.getElementById('failed-button');
+            failedButton.innerHTML = '<i class="bi bi-x-circle-fill me-2"></i>Payment Cancelled';
+            failedButton.classList.remove('d-none');
+            failedButton.classList.add('payment-status-animation');
+            
+            document.getElementById('submit-button').classList.add('d-none');
+            document.getElementById('cancel-button').classList.add('d-none');
+            
+            // Allow retry after 3 seconds
+            setTimeout(function() {
+                resetButtonStates();
+            }, 3000);
+        }
+
+        function resetButtonStates() {
+            document.getElementById('submit-button').classList.remove('d-none');
+            document.getElementById('cancel-button').classList.remove('d-none');
+            document.getElementById('success-button').classList.add('d-none');
+            document.getElementById('failed-button').classList.add('d-none');
+            
+            // Reset failed button text
+            document.getElementById('failed-button').innerHTML = '<i class="bi bi-x-circle-fill me-2"></i>Payment Failed';
+            
+            // Re-enable form inputs
+            document.getElementById('card-element').style.pointerEvents = 'auto';
+            document.getElementById('card-element').style.opacity = '1';
+            
+            // Clear any error messages
+            document.getElementById('card-errors').textContent = '';
+        }
+
+        // Simulate payment processing (replace with actual server call)
+        function simulatePaymentProcess(tokenId) {
+            // Simulate server processing time
+            setTimeout(function() {
+                // Randomly simulate success or failure for demo
+                var isSuccess = Math.random() > 0.3; // 70% success rate for demo
+                
+                if (isSuccess) {
+                    showSuccessState();
+                } else {
+                    showFailedState();
+                    document.getElementById("submit-button").disabled = false;
+                    document.getElementById("submit-button").innerHTML = '<i class="bi bi-lock-fill me-2"></i>Process Payment';
+                }
+            }, 2000);
+        }
+    </script>
+}
