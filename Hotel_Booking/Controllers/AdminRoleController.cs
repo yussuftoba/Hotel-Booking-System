@@ -57,19 +57,19 @@ namespace Hotel_Booking.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (hotelDto.ImageFile == null && hotelDto.ImageFile.Length < 0)
+                if (hotelDto.ImageFile == null && hotelDto.ImageFile?.Length < 0)
                 {
                     ModelState.AddModelError("", "You must choose an image");
                     return View(hotelDto);
                 }
 
-                var imageName = Guid.NewGuid().ToString() + Path.GetExtension(hotelDto.ImageFile.FileName);
+                var imageName = Guid.NewGuid().ToString() + Path.GetExtension(hotelDto.ImageFile?.FileName);
 
                 var folderName = env.WebRootPath + "/Images/Hotels/";
 
                 using (var stream = System.IO.File.Create(folderName + imageName))
                 {
-                    hotelDto.ImageFile.CopyTo(stream);
+                    hotelDto.ImageFile!.CopyTo(stream);
                 }
 
                 var hotel = new Hotel()
@@ -116,13 +116,13 @@ namespace Hotel_Booking.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (hotelDto.ImageFile == null && hotelDto.ImageFile.Length < 0)
+                if (hotelDto.ImageFile == null && hotelDto.ImageFile?.Length < 0)
                 {
                     ModelState.AddModelError("", "You must choose an image");
                     return View(hotelDto);
                 }
 
-                var imageName = Guid.NewGuid().ToString() + Path.GetExtension(hotelDto.ImageFile.FileName);
+                var imageName = Guid.NewGuid().ToString() + Path.GetExtension(hotelDto.ImageFile!.FileName);
 
                 var folderName = env.WebRootPath + "/Images/Hotels/";
 
@@ -184,7 +184,7 @@ namespace Hotel_Booking.Controllers
         {
             if (ModelState.IsValid)
             {
-                int hotelId = (int)TempData["HotelId"];
+                int hotelId = (int)TempData["HotelId"]!;
 				var hotel = await _unitOfWork.Hotels.GetByIdAsync(hotelId);
 
 				var imageName = Guid.NewGuid().ToString() + Path.GetExtension(roomDto.ImageUrl.FileName);
@@ -236,7 +236,7 @@ namespace Hotel_Booking.Controllers
         {
             if(ModelState.IsValid)
             {
-				int hotelId = (int)TempData["HotelId"];
+				int hotelId = (int)TempData["HotelId"]!;
 
 				var room = _unitOfWork.Rooms.FindOneItem(r => r.Id == id, new string[] { "Hotel" });
 

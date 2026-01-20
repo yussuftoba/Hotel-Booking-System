@@ -21,7 +21,7 @@ namespace Hotel_Booking
             builder.Services.AddControllersWithViews();
 
             var con = builder.Configuration.GetConnectionString("con");
-            builder.Services.AddDbContext<HotelBookingDbContext>(options => options.UseSqlServer(con));
+            builder.Services.AddDbContext<HotelBookingDbContext>(options => options.UseNpgsql(con));
 
             builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<EmailSender>();

@@ -41,7 +41,7 @@
                                             <td>@booking.CheckOutDate.ToShortDateString()</td>
                                             <td>$@booking.TotalPrice.ToString("N2")</td>
                                             <td>
-                                                <span class="badge @(GetStatusClass(booking.PaymentStatus))">
+                                                <span class="badge @(GetStatusClass(booking.PaymentStatus!))">
                                                     @(booking.PaymentStatus ?? "Unknown")
                                                 </span>
                                             </td>
