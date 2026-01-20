@@ -9,6 +9,7 @@
 
   <ItemGroup>
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
 	  <PackageReference Include="RestSharp" Version="112.1.0" />
 	  <PackageReference Include="SendGrid" Version="9.29.3" />
 	  <PackageReference Include="Stripe.net" Version="48.2.0" />
@@ -29,5 +30,18 @@
     <Folder Include="wwwroot\Images\Hotels\" />
     <Folder Include="wwwroot\Images\Rooms\" />
   </ItemGroup>
+
+	<!--Add Views folder in the publish folder-->
+	<PropertyGroup>
+		<CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
+		<CopyRazorGenerateFilesToOutputDirectory>true</CopyRazorGenerateFilesToOutputDirectory>
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+	</PropertyGroup>
+	<ItemGroup>
+		<Content Update="Views\**\*.cshtml">
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
+
 
 </Project>

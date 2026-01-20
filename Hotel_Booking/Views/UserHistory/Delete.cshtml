@@ -5,7 +5,7 @@
     // Safely extract booking ID from route data
     if (ViewContext.RouteData.Values.ContainsKey("id"))
     {
-        int.TryParse(ViewContext.RouteData.Values["id"].ToString(), out bookingId);
+        int.TryParse(ViewContext.RouteData.Values["id"]!.ToString(), out bookingId);
     }
 }
 
